@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMTELE-WEB | Simulador Educativo de Transporte por Cable</title>
+  <link rel="stylesheet" href="styles\style.css">
+</head>
+<body>
+
+  <!-- VISTA DE INICIO DE SESIÓN -->
+  <div id="vista-login" class="login-wrapper">
+    <div class="card login-card">
+      <div class="login-header">
+        <h1>SIMTELE-WEB</h1>
+        <p class="subtitle">Acceso al Simulador Educativo de Transporte por Cable</p>
+      </div>
+
+      <form id="form-login" novalidate>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label for="login-usuario">Usuario / Operador:</label>
+          <input type="text" id="login-usuario" placeholder="Ej. operador1" required>
+          <small class="hint">Usuario de prueba: <strong>admin</strong> (o cualquier nombre de mínimo 3 letras).</small>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.2rem;">
+          <label for="login-clave">Contraseña:</label>
+          <input type="password" id="login-clave" placeholder="••••" required>
+          <small class="hint">Contraseña de prueba: <strong>1234</strong> (mínimo 4 caracteres).</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Iniciar Sesión</button>
+      </form>
+
+      <div id="error-login" class="feedback error" role="alert"></div>
+    </div>
+  </div>
+
+  <!-- VISTA PRINCIPAL DEL SISTEMA (OCULTA HASTA INICIAR SESIÓN) -->
+  <div id="vista-sistema" class="oculto">
+    <header>
+      <div class="container header-flex">
+        <div>
+          <h1>SIMTELE-WEB</h1>
+          <p class="subtitle">Plataforma educativa de simulación operativa para transporte por cable</p>
+        </div>
+        <div class="user-panel">
+          <span class="user-badge">Operador: <strong id="nombre-usuario-activo"></strong></span>
+          <button type="button" id="btn-cerrar-sesion" class="btn btn-logout">Cerrar Sesión</button>
+        </div>
+      </div>
+      <div class="container">
+        <p class="disclaimer"><strong>Aviso:</strong> Todos los cálculos y umbrales son estrictamente didácticos y ficticios; no representan parámetros reales de operación.</p>
+      </div>
+    </header>
+
+    <nav aria-label="Navegación principal">
+      <ul class="nav-list container">
+        <li><a href="#modulo-detencion">1. Detención</a></li>
+        <li><a href="#modulo-mantenimiento">2. Mantenimiento</a></li>
+        <li><a href="#modulo-viento">3. Viento</a></li>
+        <li><a href="#modulo-sensores">4. Sensores</a></li>
+      </ul>
+    </nav>
+
+    <main class="container">
+      <!-- MÓDULO 1: DETENCIÓN DE EMERGENCIA -->
+      <section id="modulo-detencion" class="card">
+        <h2>1. Detención de Emergencia</h2>
+        <p class="helper-text">Calcula la distancia recorrida durante el tiempo de reacción mediante la fórmula: <code>d = (v / 3.6) × t</code>. Umbral didáctico preventivo: <strong>50 m</strong>.</p>
+        
+        <form id="form-detencion" novalidate>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="velocidad">Velocidad de cabina (km/h):</label>
+              <input type="number" id="velocidad" step="any" placeholder="Ej. 72" required>
+              <small class="hint">Ingrese un valor mayor a 0 (ej. 72 km/h).</small>
+            </div>
+            <div class="form-group">
+              <label for="tiempo">Tiempo de reacción (s):</label>
+              <input type="number" id="tiempo" step="any" placeholder="Ej. 3" required>
+              <small class="hint">Ingrese el tiempo en segundos (ej. 3 s).</small>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Calcular Distancia</button>
+        </form>
+        <div id="resultado-detencion" class="feedback" role="status" aria-live="polite"></div>
+      </section>
+
+      <!-- MÓDULO 2: MANTENIMIENTO -->
+      <section id="modulo-mantenimiento" class="card">
+        <h2>2. Registro de Mantenimiento</h2>
+        <p class="helper-text">Gestione el historial preventivo de componentes electromecánicos del sistema.</p>
+
+        <form id="form-mantenimiento" novalidate>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="componente">Nombre del componente:</label>
+              <input type="text" id="componente" placeholder="Ej. Polea motriz norte" required>
+              <small class="hint">Mínimo 3 caracteres descriptivos.</small>
+            </div>
+            <div class="form-group">
+              <label for="horas">Horas de uso acumuladas:</label>
+              <input type="number" id="horas" min="0" step="1" placeholder="Ej. 1250" required>
+              <small class="hint">Valor numérico entero mayor o igual a 0.</small>
+            </div>
+            <div class="form-group">
+              <label for="estado">Estado operativo (simulado):</label>
+              <select id="estado" required>
+                <option value="Normal">Normal</option>
+                <option value="Revisión">Revisión</option>
+                <option value="Urgente">Urgente</option>
+              </select>
+              <small class="hint">Seleccione la prioridad de atención.</small>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Agregar Registro</button>
+        </form>
+
+        <div id="error-mantenimiento" class="feedback error" role="alert"></div>
+
+        <div class="table-responsive">
+          <table id="tabla-mantenimiento">
+            <thead>
+              <tr>
+                <th>Componente</th>
+                <th>Horas de Uso</th>
+                <th>Estado</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-mantenimiento">
+              <!-- Filas generadas dinámicamente por JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- MÓDULO 3: VIENTO Y OSCILACIÓN -->
+      <section id="modulo-viento" class="card">
+        <h2>3. Viento y Oscilación</h2>
+        <p class="helper-text">Ingrese cinco mediciones simuladas (km/h). Umbrales didácticos: Promedio < 25 (Operación estable), 25–40 (Precaución por ráfagas), > 40 (Alerta de oscilación).</p>
+
+        <form id="form-viento" novalidate>
+          <div class="wind-grid">
+            <div class="form-group">
+              <label for="viento-1">Medición 1 (km/h):</label>
+              <input type="number" id="viento-1" class="input-viento" step="any" placeholder="10" required>
+            </div>
+            <div class="form-group">
+              <label for="viento-2">Medición 2 (km/h):</label>
+              <input type="number" id="viento-2" class="input-viento" step="any" placeholder="20" required>
+            </div>
+            <div class="form-group">
+              <label for="viento-3">Medición 3 (km/h):</label>
+              <input type="number" id="viento-3" class="input-viento" step="any" placeholder="30" required>
+            </div>
+            <div class="form-group">
+              <label for="viento-4">Medición 4 (km/h):</label>
+              <input type="number" id="viento-4" class="input-viento" step="any" placeholder="40" required>
+            </div>
+            <div class="form-group">
+              <label for="viento-5">Medición 5 (km/h):</label>
+              <input type="number" id="viento-5" class="input-viento" step="any" placeholder="50" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Analizar Mediciones</button>
+        </form>
+        <div id="resultado-viento" class="feedback" role="status" aria-live="polite"></div>
+      </section>
+
+      <!-- MÓDULO 4: SENSORES -->
+      <section id="modulo-sensores" class="card">
+        <h2>4. Validación y Registro de Sensores</h2>
+        <p class="helper-text">Registre lecturas de telemetría. El código debe cumplir estrictamente el formato <code>SEN-000</code> (ej. <code>SEN-001</code>).</p>
+
+        <form id="form-sensores" novalidate>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="codigo-sensor">Código del sensor:</label>
+              <input type="text" id="codigo-sensor" placeholder="Ej. SEN-001" required>
+              <small class="hint">Formato obligatorio: SEN- seguido de 3 dígitos.</small>
+            </div>
+            <div class="form-group">
+              <label for="tipo-sensor">Tipo de sensor:</label>
+              <select id="tipo-sensor" required>
+                <option value="Tensión de cable">Tensión de cable (kN)</option>
+                <option value="Temperatura motor">Temperatura motor (°C)</option>
+                <option value="Velocidad polea">Velocidad polea (m/s)</option>
+              </select>
+              <small class="hint">Seleccione la magnitud física simulada.</small>
+            </div>
+            <div class="form-group">
+              <label for="lectura-sensor">Lectura numérica:</label>
+              <input type="number" id="lectura-sensor" step="any" placeholder="Ej. 45.8" required>
+              <small class="hint">Valor numérico válido (no vacío).</small>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Registrar Sensor</button>
+        </form>
+
+        <div id="error-sensores" class="feedback error" role="alert"></div>
+
+        <div class="table-responsive">
+          <table id="tabla-sensores">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Tipo de Sensor</th>
+                <th>Lectura Registrada</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-sensores">
+              <!-- Filas generadas dinámicamente por JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        <p>Programación Web I | SIMTELE-WEB — Simulador Educativo de Transporte por Cable</p>
+        <p>Todos los umbrales y cálculos mostrados son simulaciones didácticas.</p>
+      </div>
+    </footer>
+  </div>
+
+  <script src="scripts\script.js"></script>
+</body>
+</html>
